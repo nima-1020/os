@@ -185,3 +185,70 @@ int main() {
 
 
 //2
+//2
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_REQUESTS 100
+
+// Function to swap two integers
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Function to perform bubble sort based on absolute difference
+void sort(int arr[], int n, int head) {
+    for (int i = 0; i < n-1; ++i) {
+        for (int j = 0; j < n-i-1; ++j) {
+            if (abs(arr[j] - head) > abs(arr[j+1] - head)) {
+                swap(&arr[j], &arr[j+1]);
+            }
+        }
+    }
+}
+
+// Function to calculate total head movements
+int calculateHeadMovements(int requests[], int n, int head) {
+    int total_head_movements = 0;
+    for (int i = 0; i < n; ++i) {
+        total_head_movements += abs(requests[i] - head);
+        head = requests[i];
+    }
+    return total_head_movements;
+}
+
+int main() {
+    int num_blocks, head_position;
+    int requests[MAX_REQUESTS];
+
+    // Accept input from user
+    printf("Enter the total number of disk blocks: ");
+    scanf("%d", &num_blocks);
+
+    printf("Enter the disk request string:\n");
+    for (int i = 0; i < num_blocks; ++i) {
+        scanf("%d", &requests[i]);
+    }
+
+    printf("Enter the current head position: ");
+    scanf("%d", &head_position);
+
+    // Sort the requests based on the shortest seek time
+    sort(requests, num_blocks, head_position);
+
+    // Display the ordered list of requests
+    printf("Ordered list of requests: ");
+    for (int i = 0; i < num_blocks; ++i) {
+        printf("%d ", requests[i]);
+    }
+    printf("\n");
+
+    // Calculate total head movements
+    int total_head_movements = calculateHeadMovements(requests, num_blocks, head_position);
+    printf("Total number of head movements: %d\n", total_head_movements);
+
+    return 0;
+}
+
