@@ -182,3 +182,6 @@ int main() {
     fclose(fp); // Close the file
     return 0;
 }
+
+
+//2
