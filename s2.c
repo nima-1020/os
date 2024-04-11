@@ -1,133 +1,153 @@
 //1
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include<stdlib.h>
 
-#define MAX_BLOCKS 100
+int bv[50],p,a;
+int st, len, k, c, j;
+char  fnm[20],f[20];
 
-// Node for representing a block in the disk
-typedef struct Block {
-    int blockNumber;
-    struct Block *next;
-} Block;
+void rec(int bv[],int,int);
 
-// Function prototypes
-void initializeDisk(Block *disk[], int numBlocks);
-void showBitVector(Block *disk[], int numBlocks);
-void createNewFile(Block *disk[], int numBlocks);
-void showDirectory(Block *disk[], int numBlocks);
-void deallocate(Block *disk[], int numBlocks);
+
 
 int main() {
-    int numBlocks, choice;
-    printf("Enter the number of blocks in the disk: ");
-    scanf("%d", &numBlocks);
 
-    Block *disk[MAX_BLOCKS];
-    for (int i = 0; i < numBlocks; i++) {
-        disk[i] = NULL; // Initialize all blocks as empty
+    FILE *fp;
+    int sb,len;
+    int t;
+    int op=1;
+
+
+
+    printf("\n Enter Total Block : ");
+    scanf("%d",&t);
+
+    bv[t];
+
+    for(int i=0; i<t; i++)
+        bv[i]=1;
+
+    printf("\n Bit Vector Before Allocation \n ");
+    for(int i=0; i<t; i++)
+        printf("%d",bv[i]);
+
+    printf("\n");
+
+    printf("\nEnter the number of blocks already allocated: ");
+    scanf("%d", &p);
+    printf("\nEnter the blocks already allocated: ");
+    for (int i = 0; i < p; i++) {
+        scanf("%d", &a);
+        bv[a] = 0;
     }
 
-    initializeDisk(disk, numBlocks); // Randomly allocate some blocks as occupied
 
-    while (1) {
-        printf("\nMenu:\n");
-        printf("1. Show Bit Vector\n");
-        printf("2. Create New File\n");
-        printf("3. Show Directory\n");
-        printf("4. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
+    printf("\n ");
+    while(op>=1 && op<=5)
+    {
 
-        switch (choice) {
-            case 1:
-                showBitVector(disk, numBlocks);
-                break;
-            case 2:
-                createNewFile(disk, numBlocks);
-                break;
-            case 3:
-                showDirectory(disk, numBlocks);
-                break;
-            case 4:
-                deallocate(disk, numBlocks);
-                return 0;
-            default:
-                printf("Invalid choice!\n");
+
+        printf("\n 1.Create File");
+        printf("\n 2.Show bit Vector ");
+        printf("\n 3.Delete File  ");
+        printf("\n 4.Display  ");
+        printf("\n 5.Exit");
+
+
+        printf("\n Enter option :  ");
+        scanf("%d",&op);
+
+        switch(op)
+        {
+        case 1:
+            printf("\nEnter File name : ");
+            scanf("%s",fnm);
+
+            fp = fopen(fnm, "w");
+
+            if (fp == NULL) {
+                printf("\nError opening the file.\n");
+                return 1;
+            }
+            else
+                printf("\n *** File is created *** \n ");
+
+
+            printf("Enter the index of the starting block and its length: ");
+            scanf("%d%d", &st, &len);
+            rec(bv,st,len);
+            //fclose(fp);
+            break;
+
+        case 2 :
+            printf("\n Bit Vector After  Allocation \n ");
+            for(int i=0; i<t; i++)
+                printf("%d",bv[i]);
+
+            printf("\n");
+            break;
+
+        case 3:
+            printf("\nEnter File name to delete : ");
+            scanf("%s",&f);
+            if (remove(f) == 0)
+                printf("\nDeleted successfully\n");
+
+            else
+                printf("\nUnable to delete the file\n");
+            break;
+
+        case 4 :
+            printf("\n File Details Are : \n ");
+            printf("\nF_NM\tIB\tLen\n");
+            printf("%s\t%d\t%d",fnm,st,len);
+            printf("\n");
+            break;
+
+        case 5 :
+            exit(0);
+
+
         }
+        if(op!=4 )
+        {
+            printf("\n File Details Are : \n ");
+            printf("\nF_NM\tIB\tLen\n");
+            printf("%s\t%d\t%d",fnm,st,len);
+            printf("\n");
+
+        }
+
+
     }
 
+
+
+    fclose(fp);
     return 0;
 }
 
-// Function to initialize the disk with random allocation of blocks
-void initializeDisk(Block *disk[], int numBlocks) {
-    srand(time(NULL));
-    int numOccupiedBlocks = rand() % numBlocks; // Randomly choose number of occupied blocks
+void rec(int bv[],int st,int len) {
 
-    for (int i = 0; i < numOccupiedBlocks; i++) {
-        int blockNumber = rand() % numBlocks;
-        if (disk[blockNumber] == NULL) {
-            disk[blockNumber] = (Block *)malloc(sizeof(Block));
-            disk[blockNumber]->blockNumber = blockNumber;
-            disk[blockNumber]->next = NULL;
+
+    k = len;
+    printf("\nFNm\tIndesx\tAllocated\n\n");
+    if (bv[st] == 1) {
+        for (j = st; j < (st + k); j++) {
+            if (bv[j] == 1) {
+                bv[j] = 0;
+                printf("%s\t%d------->%d\n", fnm,j, bv[j]);
+            }
+            else {
+                printf("\nThe block %d is already allocated \n\n", j);
+                k++;
+            }
         }
     }
+    else
+        printf("\nThe block %d is already allocated \n\n", st);
+
 }
-
-// Function to display the bit vector representing disk allocation status
-void showBitVector(Block *disk[], int numBlocks) {
-    printf("Bit Vector:\n");
-    for (int i = 0; i < numBlocks; i++) {
-        if (disk[i] != NULL) {
-            printf("1 ");
-        } else {
-            printf("0 ");
-        }
-    }
-    printf("\n");
-}
-
-// Function to create a new file and allocate blocks for it
-void createNewFile(Block *disk[], int numBlocks) {
-    int startBlock;
-    printf("Enter the starting block number for the new file: ");
-    scanf("%d", &startBlock);
-
-    if (disk[startBlock] == NULL) {
-        disk[startBlock] = (Block *)malloc(sizeof(Block));
-        disk[startBlock]->blockNumber = startBlock;
-        disk[startBlock]->next = NULL;
-        printf("File created successfully.\n");
-    } else {
-        printf("Block is already allocated.\n");
-    }
-}
-
-// Function to display the directory
-void showDirectory(Block *disk[], int numBlocks) {
-    printf("Directory:\n");
-    for (int i = 0; i < numBlocks; i++) {
-        if (disk[i] != NULL) {
-            printf("Block %d: Allocated\n", i);
-        } else {
-            printf("Block %d: Free\n", i);
-        }
-    }
-}
-
-// Function to deallocate all allocated blocks
-void deallocate(Block *disk[], int numBlocks) {
-    for (int i = 0; i < numBlocks; i++) {
-        if (disk[i] != NULL) {
-            free(disk[i]);
-            disk[i] = NULL;
-        }
-    }
-    printf("Deallocated all blocks.\n");
-}
-
-
 //2
 #include <stdio.h>
 #include <stdlib.h>
